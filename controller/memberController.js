@@ -1,6 +1,36 @@
 import jwt from "jsonwebtoken";
 import database from "../service/database.js";
 import bcrypt from "bcrypt";
+import multer from "multer"
+
+// upload part
+// กำหนดตำแหน่งที่จะเก็บ file ที่ upload --> img_mem
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, 'img_mem')
+  },
+  // กำหนดชื่อ file
+  filename: function (req, file, cb) {
+      const filename = `${req.body.memEmail}.jpg`
+      cb(null, filename)
+  }
+})
+// จำกัดประเภทของไฟล์ที่อัปโหลด
+const upload = multer({
+  storage: storage,
+}).single('file');
+
+//ส่วน Upload File
+export async function uploadMember(req, res) {
+  console.log("Upload Member Image")
+   upload(req, res, (err) => {
+       if (err) {
+           return res.status(400).json({ message: err.message });
+       }
+       res.status(200).json({ message: 'File uploaded successfully!' });
+   });
+}
+
 export async function postMember(req, res) {
   console.log(`Post Member is req`);
   try {
